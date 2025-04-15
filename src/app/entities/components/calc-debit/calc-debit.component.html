@@ -1,0 +1,45 @@
+<div class="container">
+  <!-- Левая часть: форма -->
+  <div class="form-panel">
+    <button mat-raised-button color="primary" style="margin-bottom: 24px;" routerLink="/main">
+      Вернуться на главную
+    </button>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <ng-container *ngFor="let field of fields">
+        <mat-form-field appearance="fill">
+          <mat-label>{{ field.label }}</mat-label>
+          <input
+            matInput
+            [formControlName]="field.name"
+            required
+          />
+
+          <mat-error *ngIf="form.get(field.name)?.hasError('required')">
+            Это поле обязательно
+          </mat-error>
+          <mat-error *ngIf="form.get(field.name)?.hasError('onlyPositive')">
+            Введите положительное число
+          </mat-error>
+        </mat-form-field>
+      </ng-container>
+
+      <button mat-raised-button [disabled]="!form.valid" color="primary" type="submit">
+        Рассчитать дебит
+      </button>
+    </form>
+  </div>
+
+  <!-- Правая часть: результат -->
+  <div class="result-panel">
+    <h3 style="font-family: 'Raleway', sans-serif;">Результат</h3>
+
+    <div *ngIf="result.length > 0" class="result-box">
+      <div *ngFor="let res of result" class="result-line">
+        {{ res }}
+      </div>
+
+      <button mat-stroked-button (click)="copyResult()">Скопировать результат</button>
+    </div>
+  </div>
+</div>

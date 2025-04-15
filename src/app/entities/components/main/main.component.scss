@@ -1,0 +1,51 @@
+.full-image-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; // растягивает на весь экран, не обрезая (высота сохраняется)
+    display: block;
+  }
+}
+
+.image-button {
+  position: absolute;
+  bottom: 6.7%;
+  padding: 1.5vw 1vw;
+  font-size: 1.7vw;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Raleway', sans-serif;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.image-button.left {
+  left: 26.7%;
+}
+
+.image-button.right {
+  right: 27.5%;
+}
+
+.mainText {
+  position: absolute;
+  top: 19.8%;
+  left: 50.1%;
+  transform: translateX(-50%);
+  font-family: 'Raleway', sans-serif;
+  font-size: 2.3vw;
+  font-weight: 600;
+  color: #222;
+  text-align: center;
+  z-index: 2;
+  max-width: 40vw;
+  word-wrap: break-word;
+}

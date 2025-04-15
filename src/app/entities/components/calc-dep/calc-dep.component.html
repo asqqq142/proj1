@@ -1,0 +1,73 @@
+<div class="container">
+  <!-- Левая часть: форма -->
+  <div class="form-panel">
+    <button mat-raised-button color="primary" style="margin-bottom: 24px;" routerLink="/main">
+      Вернуться на главную
+    </button>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Выбор переменной -->
+      <mat-form-field appearance="fill">
+        <mat-label>Выберите переменную для анализа</mat-label>
+        <mat-select formControlName="variable">
+          <mat-option *ngFor="let option of variableOptions" [value]="option.name">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Поля для всех параметров -->
+      <ng-container *ngFor="let field of fields">
+        <mat-form-field appearance="fill" *ngIf="field.name !== form.get('variable')?.value">
+          <mat-label>{{ field.label }}</mat-label>
+          <input matInput [formControlName]="field.name" />
+          <mat-error *ngIf="form.get(field.name)?.hasError('required')">
+            Это поле обязательно
+          </mat-error>
+          <mat-error *ngIf="form.get(field.name)?.hasError('onlyPositive')">
+            Введите положительное число
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Особое поле: множественный ввод -->
+        <mat-form-field appearance="fill" *ngIf="field.name === form.get('variable')?.value">
+          <mat-label>{{ field.label }} (несколько значений через ;) </mat-label>
+          <input matInput [formControlName]="field.name" />
+          <mat-error *ngIf="form.get(field.name)?.hasError('required')">
+            Это поле обязательно
+          </mat-error>
+          <mat-error *ngIf="form.get(field.name)?.hasError('onlyPositive')">
+            Введите положительные числа через точку с запятой
+          </mat-error>
+        </mat-form-field>
+      </ng-container>
+
+      <button mat-raised-button color="primary" [disabled]="!form.valid" type="submit">
+        Рассчитать дебит
+      </button>
+    </form>
+  </div>
+
+  <!-- Правая часть: результат -->
+  <div class="result-panel">
+    <h3 style="font-family: 'Raleway', sans-serif;">Результат</h3>
+
+    <div *ngIf="result.length > 0" class="result-box">
+      <div *ngFor="let res of result" class="result-line">
+        {{ res }}
+      </div>
+
+      <button mat-stroked-button (click)="copyResult()">Скопировать результат</button>
+
+      <div style="margin-top: 24px;">
+        <canvas
+          baseChart
+          [data]="chartConfig.data"
+          [type]="chartConfig.type"
+          [options]="chartConfig.options">
+        </canvas>
+      </div>
+    </div>
+
+  </div>
+</div>
