@@ -6,7 +6,7 @@
     </button>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <ng-container *ngFor="let field of fields">
+      <ng-container *ngFor="let field of fields" >
         <mat-form-field appearance="fill">
           <mat-label>{{ field.label }}</mat-label>
           <input
@@ -25,7 +25,7 @@
       </ng-container>
 
       <button mat-raised-button [disabled]="!form.valid" color="primary" type="submit">
-        Рассчитать дебит
+        Рассчитать
       </button>
     </form>
   </div>
@@ -40,6 +40,7 @@
       </div>
 
       <button mat-stroked-button (click)="copyResult()">Скопировать результат</button>
+      <button mat-stroked-button (click)="replaceDotsWithCommas()" style="margin-left: 12px">Заменить точки на запятые</button>
     </div>
   </div>
 </div>

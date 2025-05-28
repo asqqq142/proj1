@@ -5,69 +5,102 @@
       Вернуться на главную
     </button>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <!-- Выбор переменной -->
+    <form [formGroup]="form" (ngSubmit)="onCalculate()">
       <mat-form-field appearance="fill">
-        <mat-label>Выберите переменную для анализа</mat-label>
+        <mat-label>Выберите фактор для анализа</mat-label>
         <mat-select formControlName="variable">
           <mat-option *ngFor="let option of variableOptions" [value]="option.name">
             {{ option.label }}
           </mat-option>
         </mat-select>
       </mat-form-field>
+      <mat-form-field appearance="fill" style="width: 100%; margin-bottom: 12px;">
+        <mat-label>Название расчёта (опционально)</mat-label>
+        <input matInput formControlName="customLabel" maxlength="40">
+      </mat-form-field>
 
-      <!-- Поля для всех параметров -->
       <ng-container *ngFor="let field of fields">
         <mat-form-field appearance="fill" *ngIf="field.name !== form.get('variable')?.value">
           <mat-label>{{ field.label }}</mat-label>
           <input matInput [formControlName]="field.name" />
-          <mat-error *ngIf="form.get(field.name)?.hasError('required')">
-            Это поле обязательно
-          </mat-error>
-          <mat-error *ngIf="form.get(field.name)?.hasError('onlyPositive')">
-            Введите положительное число
-          </mat-error>
+          <mat-error *ngIf="form.get(field.name)?.hasError('required')">Это поле обязательно</mat-error>
+          <mat-error *ngIf="form.get(field.name)?.hasError('onlyPositive')">Введите положительное число</mat-error>
         </mat-form-field>
-
-        <!-- Особое поле: множественный ввод -->
         <mat-form-field appearance="fill" *ngIf="field.name === form.get('variable')?.value">
-          <mat-label>{{ field.label }} (несколько значений через ;) </mat-label>
+          <mat-label>{{ field.label }} (несколько значений через ;)</mat-label>
           <input matInput [formControlName]="field.name" />
-          <mat-error *ngIf="form.get(field.name)?.hasError('required')">
-            Это поле обязательно
-          </mat-error>
-          <mat-error *ngIf="form.get(field.name)?.hasError('onlyPositive')">
-            Введите положительные числа через точку с запятой
-          </mat-error>
+          <mat-error *ngIf="form.get(field.name)?.hasError('required')">Это поле обязательно</mat-error>
+          <mat-error *ngIf="form.get(field.name)?.hasError('onlyPositive')">Введите положительные числа через точку с запятой</mat-error>
         </mat-form-field>
       </ng-container>
 
+
+      <!-- Кнопка рассчитать всегда видна -->
       <button mat-raised-button color="primary" [disabled]="!form.valid" type="submit">
-        Рассчитать дебит
+        Рассчитать
+      </button>
+
+      <!-- Кнопка дополнить расчет появляется, когда уже был хотя бы один расчет -->
+      <button
+        mat-stroked-button
+        color="primary"
+        style="margin-left: 12px; margin-top: 12px"
+        type="button"
+        style="margin-top: 16px;"
+        *ngIf="canAddCalculation"
+        (click)="onAddCalculation()">
+        Добавить расчёт
       </button>
     </form>
   </div>
 
-  <!-- Правая часть: результат -->
+  <!-- Правая часть: результат (видна только если есть хоть один расчет) -->
   <div class="result-panel">
     <h3 style="font-family: 'Raleway', sans-serif;">Результат</h3>
-
-    <div *ngIf="result.length > 0" class="result-box">
-      <div *ngFor="let res of result" class="result-line">
-        {{ res }}
+    <div *ngIf="hasResults" class="result-box">
+    <div class="result-box">
+      <div *ngFor="let series of allResults; let i = index">
+        <b [style.color]="series.color">{{series.label}}</b>
+        <div class="result-box" style="margin-top: 4px;">
+          <div *ngFor="let res of series.results" class="result-line">{{ res }}</div>
+        </div>
       </div>
 
-      <button mat-stroked-button (click)="copyResult()">Скопировать результат</button>
+      <div style="margin-top: 12px;">
+        <button mat-stroked-button (click)="copyAllResults()">Скопировать результат</button>
+        <button mat-stroked-button (click)="replaceDotsWithCommas()" style="margin-left: 12px">
+          Заменить точки на запятые
+        </button>
+      </div>
 
+      <!-- График (сразу под результатами) -->
       <div style="margin-top: 24px;">
-        <canvas
-          baseChart
-          [data]="chartConfig.data"
-          [type]="chartConfig.type"
-          [options]="chartConfig.options">
-        </canvas>
+        <button mat-stroked-button color="primary" (click)="downloadChart()">Скачать график</button>
+        <button mat-stroked-button (click)="toggleEnlargeChart()" style="margin-left: 12px">Увеличить график</button>
+        <div *ngIf="!enlarged" style="margin-top: 16px;">
+          <canvas
+            baseChart
+            [data]="chartConfig.data"
+            [type]="chartConfig.type"
+            [options]="chartConfig.options"
+            style="background: #fff;">
+          </canvas>
+        </div>
+        <div class="modal-overlay" *ngIf="enlarged">
+          <div class="modal-content">
+            <button class="close-button" (click)="toggleEnlargeChart()">✕</button>
+            <canvas
+              baseChart
+              #modalChart
+              [data]="chartConfig.data"
+              [type]="chartConfig.type"
+              [options]="chartConfig.options"
+              style="background: #fff;">
+            </canvas>
+          </div>
+        </div>
       </div>
     </div>
-
+  </div>
   </div>
 </div>

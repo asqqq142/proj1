@@ -13,8 +13,8 @@ export class CalcDebitComponent {
     Rkv: ['', [Validators.required, this.positiveNumberOnly()]],
     H: ['', [Validators.required, this.positiveNumberOnly()]],
     Lh: ['', [Validators.required, this.positiveNumberOnly()]],
-    Rkh: ['', [Validators.required, this.positiveNumberOnly()]],
     Rc: ['', [Validators.required, this.positiveNumberOnly()]],
+    Rkh: ['', [Validators.required, this.positiveNumberOnly()]],
     v: ['', [Validators.required, this.positiveNumberOnly()]],
     Ppl: ['', [Validators.required, this.positiveNumberOnly()]],
     deltaP: ['', [Validators.required, this.positiveNumberOnly()]],
@@ -27,20 +27,69 @@ export class CalcDebitComponent {
   public onSubmit(): void {
     if (this.form.valid) {
       const { Rkv, H, Lh, Rkh, Rc, v, Ppl, deltaP, Av, Bv } = this.form.value;
-      const h1: number = (H/2) - Rc;
-      const A: number = Av * Math.PI * h1 / Math.log(Rkv/Rc);
-      const B: number = 2 * Bv * (Math.PI * h1)**2 / (1/Rc - 1/Rkv);
-      const Ah: number = A/2/Lh*(2/h1/v*(h1*v+Rc*Math.log(Rc/(Rc+h1*v)))+(Rkh-v*h1)/(Rc+v*h1));
-      const Bh: number = B/8/Lh**2*(2/v/h1*(Math.log((Rc+v*h1)/Rc)-v*h1/(Rc+v*h1)+(Rkh-v*h1)/(Rc+v*h1)**2));
-      const debit: number = ((-Ah + (Ah + 4 * Bh * (Ppl**2 - (Ppl- deltaP)**2))**0.5) / 2 / Bh);
+
+      const toNum = (val: any): number => parseFloat(String(val).replace(',', '.'));
+
+      const _Rkv = toNum(Rkv);
+      const _H = toNum(H);
+      const _Lh = toNum(Lh);
+      const _Rkh = toNum(Rkh);
+      const _Rc = toNum(Rc);
+      const _v = toNum(v);
+      const _Ppl = toNum(Ppl);
+      const _deltaP = toNum(deltaP);
+      const _Av = toNum(Av);
+      const _Bv = toNum(Bv);
+
+      const h1: number = _H / 2 - _Rc;
+      const A: number = _Av * Math.PI * h1 / Math.log(_Rkv / _Rc);
+      const B: number = 2 * _Bv * (Math.PI * h1)**2 / (1 / _Rc - 1 / _Rkv);
+
+      const Ah = (A / (2 * _Lh)) * (
+        (2 / (_v * h1)) * (_v * h1 + _Rc * Math.log(_Rc / (_Rc + _v * h1))) +
+        (_Rkh - _v * h1) / (_Rc + _v * h1)
+      );
+
+      const Bh = B / (8 * _Lh ** 2) * (
+        (2 / (_v * h1)) * (
+          Math.log((_Rc + _v * h1) / _Rc) -
+          (_v * h1) / (_Rc + _v * h1)
+        ) +
+        (_Rkh - _v * h1) / Math.pow((_Rc + _v * h1), 2)
+      );
+
+      const discriminant = Ah ** 2 + 4 * Bh * (_Ppl ** 2 - (_Ppl - _deltaP) ** 2);
+
+      if (discriminant < 0 || isNaN(discriminant)) {
+        console.warn('❌ Подкоренное выражение отрицательное или нечисло:', discriminant);
+        this.result = [
+          `h₁ = ${h1.toFixed(3)} м`,
+          `A* = ${A.toFixed(7)} МПа²·сут·м/тыс.м³`,
+          `B* = ${B.toFixed(7)} МПа²·сут/тыс.м³)²·м³`,
+          `Aг = ${Ah.toFixed(7)} МПа²·сут/тыс.м³`,
+          `Bг = ${Bh.toExponential(2)} (МПа²·сут/тыс.м³)²`,
+          `❌ Ошибка: подкоренное выражение < 0`
+        ];
+        return;
+      }
+
+      const debit: number = ((-Ah + Math.sqrt(discriminant)) / (2 * Bh))*2;
+
+      if (isNaN(debit)) {
+        console.warn('❌ Итоговый дебит = NaN. Проверь значения:', { Ah, Bh, discriminant });
+      }
+
       this.result = [
-        `h₁ = ${h1.toFixed(4)} м`,
-        `A* = ${A.toFixed(7)}`,
-        `B* = ${B.toFixed(7)} `,
-        `Aг = ${Ah.toFixed(7)}`,
-        `Bг = ${Bh.toFixed(7)}`,
-        `Дебит скважины: ${debit.toFixed(10)} тыс.м³/сут`
+        `h₁ = ${h1.toFixed(3)} м,` +
+        `A* = ${A.toFixed(7)} МПа²·сут·м/тыс.м³,` +
+        `B* = ${B.toFixed(7)} МПа²·сут/тыс.м³)²·м³,` +
+        `Aг₁=Аг₂= ${Ah.toFixed(7)} МПа²·сут/тыс.м³,` +
+        `Bг₁=Вг₂= ${Bh.toExponential(2)} (МПа²·сут/тыс.м³)²,`,
+        `Дебит скважины: ${debit.toFixed(2)} тыс.м³/сут`
       ];
+
+      // 👇 Прокрутка вверх после расчёта
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -55,15 +104,15 @@ export class CalcDebitComponent {
     }
   }
 
-
-
   public positiveNumberOnly(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = control.value;
-      const isValid = /^\d*\.?\d+$/.test(value) && parseFloat(value) > 0;
+      if (typeof control.value !== 'string') return { onlyPositive: true };
+      const normalized = control.value.replace(',', '.');
+      const isValid = /^\d*\.?\d+$/.test(normalized) && parseFloat(normalized) > 0;
       return isValid ? null : { onlyPositive: true };
     };
   }
+
   public fields = [
     { name: 'Rkv', label: 'Радиус контура питания вертикальной скважины, м' },
     { name: 'H', label: 'Толщина пласта, м' },
@@ -76,5 +125,14 @@ export class CalcDebitComponent {
     { name: 'Av', label: 'Аверт, МПа²·сут/тыс.м³' },
     { name: 'Bv', label: 'Вверт, (МПа²·сут/тыс.м³)²' },
   ];
-
+  private originalResult: string[] | null = null;
+  public replaceDotsWithCommas(): void {
+    if (!this.originalResult) {
+      this.originalResult = [...this.result];
+      this.result = this.result.map(line => line.replace(/(\d+)\.(\d+)/g, '$1,$2'));
+    } else {
+      this.result = [...this.originalResult];
+      this.originalResult = null;
+    }
+  }
 }

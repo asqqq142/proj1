@@ -1,0 +1,117 @@
+<div class="container">
+  <!-- Левая часть: форма -->
+  <div class="form-panel">
+    <button mat-raised-button color="primary" style="margin-bottom: 24px;" routerLink="/main">
+      Вернуться на главную
+    </button>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill">
+        <mat-label>Выберите факторы для анализа</mat-label>
+        <mat-select formControlName="variables" multiple>
+          <mat-option *ngFor="let option of variableOptions" [value]="option.name">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <ng-container *ngFor="let field of fields">
+        <ng-container *ngIf="(form.get('variables')?.value || []).includes(field.name); else defaultField">
+          <mat-form-field appearance="fill">
+            <mat-label>Исходное значение: {{ field.label }}</mat-label>
+            <input matInput [formControlName]="'base_' + field.name" />
+            <mat-error *ngIf="form.get('base_' + field.name)?.hasError('required')">
+              Это поле обязательно
+            </mat-error>
+            <mat-error *ngIf="form.get('base_' + field.name)?.hasError('onlyPositive')">
+              Введите положительное число
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>{{ field.label }} (значения для анализа, через ;)</mat-label>
+            <input matInput [formControlName]="field.name" />
+            <mat-error *ngIf="form.get(field.name)?.hasError('onlyPositive')">
+              Введите положительные числа через точку с запятой
+            </mat-error>
+          </mat-form-field>
+        </ng-container>
+        <ng-template #defaultField>
+          <mat-form-field appearance="fill">
+            <mat-label>{{ field.label }}</mat-label>
+            <input matInput [formControlName]="'base_' + field.name" />
+            <mat-error *ngIf="form.get('base_' + field.name)?.hasError('required')">
+              Это поле обязательно
+            </mat-error>
+            <mat-error *ngIf="form.get('base_' + field.name)?.hasError('onlyPositive')">
+              Введите положительное число
+            </mat-error>
+          </mat-form-field>
+        </ng-template>
+      </ng-container>
+
+      <button mat-raised-button color="primary" [disabled]="!form.valid" type="submit">
+        Рассчитать
+      </button>
+    </form>
+  </div>
+
+  <!-- Правая часть: результат -->
+  <div class="result-panel">
+    <h3 style="font-family: 'Raleway', sans-serif;">Результат</h3>
+    <div *ngIf="result.length > 0" class="result-box">
+      <div *ngFor="let res of result" class="result-line">
+        {{ res }}
+      </div>
+      <button mat-stroked-button (click)="copyResult()">Скопировать результат</button>
+      <button mat-stroked-button (click)="replaceDotsWithCommas()" style="margin-left: 12px">
+        Заменить точки на запятые
+      </button>
+
+      <!-- Торнадо-диаграмма -->
+      <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 30px;">
+        <div style="position: relative;">
+          <b>Сравнение влияния факторов</b>
+          <div style="display: flex; gap: 12px; margin: 12px 0 0 0;">
+            <mat-button-toggle-group
+                                     [value]="tornadoDisplayMode"
+                                     (change)="switchTornadoDisplayMode($event.value)"
+                                     name="displayMode"
+            >
+              <mat-button-toggle value="absolute">В тыс.м³/сут</mat-button-toggle>
+              <mat-button-toggle value="percent">В %</mat-button-toggle>
+            </mat-button-toggle-group>
+            <button mat-stroked-button color="primary" (click)="downloadTornadoChart()">Скачать диаграмму</button>
+            <button mat-stroked-button (click)="toggleEnlargeTornadoChart()">Увеличить диаграмму</button>
+          </div>
+          <div style="margin-top: 16px;">
+            <canvas
+              #chartTornado
+              class="tornado-canvas"
+              [attr.height]="chartHeight"
+              [attr.width]="350"
+              style="background: #fff; width: 100%;">
+            </canvas>
+          </div>
+          <!-- Модальное окно для увеличения -->
+          <div *ngIf="enlargedTornado" class="modal-overlay">
+            <div class="modal-content">
+              <button class="close-button" (click)="toggleEnlargeTornadoChart()">✕</button>
+              <canvas
+                #chartTornadoModal
+                style="background: #fff; width: 1000px; height: 600px;">
+              </canvas>
+            </div>
+          </div>
+        </div>
+        <!-- Пояснение к диаграмме -->
+        <div style="font-size: 15px; color: #666; background: #f8f8f8; border-radius: 12px; padding: 20px;">
+          <br>
+          Диаграмма торнадо позволяет визуально оценить, на какие факторы скважины (или пласта) дебит реагирует наиболее сильно.
+          <br>
+          Для каждого фактора показано, как изменение его влияет на дебит относительно исходного значения.<br>
+          Факторы на диаграмме отсортированы  в порядке убывания влияния.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -28,20 +28,23 @@
 }
 
 .image-button.left {
-  left: 26.7%;
+  left: 10.7%;
 }
 
 .image-button.right {
-  right: 27.5%;
+  right: 10.7%;
+}
+.image-button.middle {
+  right: 45.9%;
 }
 
 .mainText {
   position: absolute;
-  top: 19.8%;
+  top: 21.8%;
   left: 50.1%;
   transform: translateX(-50%);
   font-family: 'Raleway', sans-serif;
-  font-size: 2.3vw;
+  font-size: 2.2vw;
   font-weight: 600;
   color: #222;
   text-align: center;

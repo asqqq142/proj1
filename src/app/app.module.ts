@@ -13,6 +13,10 @@ import { MainComponent } from './entities/components/main/main.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule} from "@angular/material/select";
 import { NgChartsModule } from 'ng2-charts';
+import { CompareDebitComponent } from './entities/components/compare-debit/compare-debit.component';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import {Tooltip} from "chart.js";
 
 
 @NgModule({
@@ -21,6 +25,7 @@ import { NgChartsModule } from 'ng2-charts';
     CalcDebitComponent,
     CalcDepComponent,
     MainComponent,
+    CompareDebitComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,6 +38,8 @@ import { NgChartsModule } from 'ng2-charts';
     MatCardModule,
     MatSelectModule,
     NgChartsModule,
+    MatButtonToggleModule,
+    MatTooltipModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

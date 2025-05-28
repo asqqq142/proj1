@@ -106,4 +106,38 @@ canvas {
   &:hover {
     background: rgba(0, 0, 0, 0.1);
   }
+  .modal-overlay {
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-content {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 32px 20px 32px;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+  .close-button {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    font-size: 1.7em;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #888;
+  }
+  .tornado-canvas {
+    width: 480px !important;
+    height: 240px !important;
+    max-width: 100%;
+    margin: 0 auto;
+    display: block;
+  }
+
 }
