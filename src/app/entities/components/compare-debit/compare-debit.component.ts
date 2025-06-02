@@ -8,8 +8,8 @@ Chart.register(...registerables);
 
 type TornadoRow = {
   label: string;
-  deltaAbsMinus: number;    // ΔQ (base -> min)
-  deltaAbsPlus: number;     // ΔQ (base -> max)
+  deltaAbsMinus: number;   
+  deltaAbsPlus: number;   
   deltaPercentMinus: number;
   deltaPercentPlus: number;
   minValue: number;
@@ -17,7 +17,7 @@ type TornadoRow = {
   qBase: number;
   qMin: number;
   qMax: number;
-  absMax: number;           // максимальное по модулю (для сортировки)
+  absMax: number;     
 };
 
 @Component({
@@ -135,16 +135,15 @@ export class CompareDebitComponent implements OnInit {
       const inputs = this.form.value;
       const toNum = (val: any): number => parseFloat(String(val).replace(',', '.'));
 
-      // 1. Сбор базовых параметров
+
       const baseParams: any = {};
       this.fields.forEach(field => {
         baseParams[field.name] = toNum(inputs['base_' + field.name]);
       });
 
-      // 2. Считаем Q_base
+
       const Q_base = this.calcDebit(baseParams);
 
-      // 3. Формируем tornadoRows и result[]
       let tornadoRows: TornadoRow[] = [];
 
       variables.forEach((variable, i) => {
@@ -161,7 +160,6 @@ export class CompareDebitComponent implements OnInit {
 
         values = [baseValue, ...values];
         values = Array.from(new Set(values));
-        // Сортируем для расчётов и текста
         values = values.sort((a: number, b : number) => a - b);
 
         const debits: number[] = [];
@@ -170,7 +168,7 @@ export class CompareDebitComponent implements OnInit {
           debits.push(this.calcDebit(localParams));
         });
 
-        // Текстовый вывод
+
         this.result.push(`${i + 1}) Расчеты по фактору: ${variableLabel}.`);
         values.forEach((value: number, idx: number) => {
           this.result.push(
@@ -204,7 +202,6 @@ export class CompareDebitComponent implements OnInit {
         const qMax = Math.max(...debits);
         const minValue = values[debits.indexOf(qMin)];
         const maxValue = values[debits.indexOf(qMax)];
-        // Для торнадо: используем именно min и max значения (без base)
         const deltaAbsMinus = qMin - Q_base;
         const deltaAbsPlus = qMax - Q_base;
         const deltaPercentMinus = Q_base !== 0 ? (deltaAbsMinus / Q_base) * 100 : 0;
@@ -226,11 +223,9 @@ export class CompareDebitComponent implements OnInit {
         });
       });
 
-      // 5. Сортировка по максимальному влиянию (по модулю)
       tornadoRows = tornadoRows.sort((a, b) => b.absMax - a.absMax);
       this._lastTornadoRows = tornadoRows;
 
-      // 6. Обновить данные графика (двусторонний)
       this.updateTornadoData(tornadoRows);
 
       setTimeout(() => this.renderTornadoChart(), 0);
@@ -254,7 +249,7 @@ export class CompareDebitComponent implements OnInit {
     const barPercentage = 0.7;
     const categoryPercentage = 0.6;
 
-    // --- Новый datalabels ---
+
     const alignHandler = (ctx: any) => {
       const value = ctx.dataset.data[ctx.dataIndex];
       if (Math.abs(value) < 15) {
@@ -320,7 +315,6 @@ export class CompareDebitComponent implements OnInit {
           datalabels: {
             display: (ctx: any) => {
               const value = Number(ctx.dataset.data[ctx.dataIndex]);
-              // Лейблы не показываются если оба маленькие - реализуй это по желанию!
               return Math.abs(value) > 0.3;
             },
             anchor: (ctx: any) => {
@@ -411,7 +405,6 @@ export class CompareDebitComponent implements OnInit {
           datalabels: {
             display: (ctx: any) => {
               const value = Number(ctx.dataset.data[ctx.dataIndex]);
-              // Лейблы не показываются если оба маленькие - реализуй это по желанию!
               return Math.abs(value) > 0.3;
             },
             anchor: (ctx: any) => {
@@ -426,7 +419,7 @@ export class CompareDebitComponent implements OnInit {
             },
             offset: (ctx: any) => {
               const value = Number(ctx.dataset.data[ctx.dataIndex]);
-              if (Math.abs(value) < 25) return value > 0 ? 10 : -1; //процент
+              if (Math.abs(value) < 25) return value > 0 ? 10 : -1; 
               return 0;
             },
             color: (ctx: any) => {
