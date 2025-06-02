@@ -22,7 +22,7 @@ type Curve = {
   variableLabel: string;
   data: { x: number, y: number }[];
   results: string[];
-  resultsRaw: string[]; // для точки/запятой
+  resultsRaw: string[]; 
 };
 
 @Component({
@@ -36,7 +36,7 @@ export class CalcDepComponent implements OnInit {
   public enlarged = false;
 
   public allResults: Curve[] = [];
-  private showCommas = false; // Для кнопки "заменить точки на запятые"
+  private showCommas = false; 
 
   get canAddCalculation(): boolean {
     if (this.allResults.length === 0) return false;
@@ -132,7 +132,7 @@ export class CalcDepComponent implements OnInit {
     this.applyValidators();
     this.form.get('variable')?.valueChanges.subscribe(() => {
       this.applyValidators();
-      this.updateChart(); // <-- добавь этот вызов!
+      this.updateChart(); 
 
     });
 
@@ -152,7 +152,7 @@ export class CalcDepComponent implements OnInit {
     });
   }
 
-  // Основная кнопка "Рассчитать" — пересчитывает всё заново
+  
   public onCalculate(): void {
     this.allResults = [];
     this.addMode = false;
@@ -161,13 +161,13 @@ export class CalcDepComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Кнопка "Добавить расчет" — добавляет новую кривую
+
   public onAddCalculation(): void {
     this.addMode = true;
     this.addCalculation();
   }
 
-  // Внутренний расчет
+
   private addCalculation(): void {
     if (this.form.valid) {
       const variable = this.form.get('variable')?.value;
@@ -228,7 +228,7 @@ export class CalcDepComponent implements OnInit {
         if (discriminant >= 0) {
           debit = ((-Ah + Math.sqrt(discriminant)) / (2 * Bh))*2;
         }
-        // Вывод подробный как просили
+ 
         const out =
           `\n${index + 1}) ${variableLabel.split(',')[0]}: ${value} ${unit},\n` +
           `h₁ = ${h1.toFixed(3)} м,\n` +
@@ -241,7 +241,7 @@ export class CalcDepComponent implements OnInit {
         chartData.push({ x: value, y: Number(debit.toFixed(2)) });
       });
 
-      // Аналитическая фраза как раньше
+
       if (chartData.length > 1) {
         const xMin = chartData[0].x;
         const xMax = chartData[chartData.length - 1].x;
@@ -260,7 +260,7 @@ export class CalcDepComponent implements OnInit {
         resultsRaw.push(summary);
       }
 
-      // В зависимости от флага showCommas, преобразуем точки в запятые или нет
+
       let resultsDisplay = resultsRaw.map(line =>
         this.showCommas ? line.replace(/(\d+)\.(\d+)/g, '$1,$2') : line
       );
@@ -291,7 +291,7 @@ export class CalcDepComponent implements OnInit {
       tension: 0
     })) as ChartDataset<'line'>[];
 
-    // --- Получаем актуальную подпись ---
+
     let variableLabel = '';
     if (this.allResults.length) {
       const lastCurve = this.allResults[this.allResults.length - 1];
@@ -302,7 +302,7 @@ export class CalcDepComponent implements OnInit {
       variableLabel = field?.label ?? '';
     }
 
-    // --- ВАЖНО: пересоздаём объект options ---
+
     this.chartConfig.options = {
       ...this.chartConfig.options,
       scales: {
@@ -331,7 +331,6 @@ export class CalcDepComponent implements OnInit {
     this.updateChart();
   }
 
-  // Копирование всегда идет с точками
   public async copyAllResults(withComma: boolean = this.showCommas): Promise<void> {
     const formatResults = (line: string) =>
       withComma ? line.replace(/(\d+)\.(\d+)/g, '$1,$2') : line;
@@ -381,7 +380,6 @@ export class CalcDepComponent implements OnInit {
     };
   }
 
-  // Заменить точки на запятые/назад — в отображении, не трогаем сырые значения
   public replaceDotsWithCommas(): void {
     this.showCommas = !this.showCommas;
     this.allResults.forEach(curve => {
