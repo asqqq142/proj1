@@ -1,5 +1,5 @@
 <div class="container">
-  <!-- Левая часть: форма -->
+
   <div class="form-panel">
     <button mat-raised-button color="primary" style="margin-bottom: 24px;" routerLink="/main">
       Вернуться на главную
@@ -35,12 +35,11 @@
       </ng-container>
 
 
-      <!-- Кнопка рассчитать всегда видна -->
       <button mat-raised-button color="primary" [disabled]="!form.valid" type="submit">
         Рассчитать
       </button>
 
-      <!-- Кнопка дополнить расчет появляется, когда уже был хотя бы один расчет -->
+
       <button
         mat-stroked-button
         color="primary"
@@ -54,7 +53,6 @@
     </form>
   </div>
 
-  <!-- Правая часть: результат (видна только если есть хоть один расчет) -->
   <div class="result-panel">
     <h3 style="font-family: 'Raleway', sans-serif;">Результат</h3>
     <div *ngIf="hasResults" class="result-box">
@@ -73,7 +71,7 @@
         </button>
       </div>
 
-      <!-- График (сразу под результатами) -->
+
       <div style="margin-top: 24px;">
         <button mat-stroked-button color="primary" (click)="downloadChart()">Скачать график</button>
         <button mat-stroked-button (click)="toggleEnlargeChart()" style="margin-left: 12px">Увеличить график</button>
