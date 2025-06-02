@@ -1,5 +1,5 @@
 <div class="container">
-  <!-- Левая часть: форма -->
+
   <div class="form-panel">
     <button mat-raised-button color="primary" style="margin-bottom: 24px;" routerLink="/main">
       Вернуться на главную
@@ -55,7 +55,6 @@
     </form>
   </div>
 
-  <!-- Правая часть: результат -->
   <div class="result-panel">
     <h3 style="font-family: 'Raleway', sans-serif;">Результат</h3>
     <div *ngIf="result.length > 0" class="result-box">
@@ -67,7 +66,6 @@
         Заменить точки на запятые
       </button>
 
-      <!-- Торнадо-диаграмма -->
       <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 30px;">
         <div style="position: relative;">
           <b>Сравнение влияния факторов</b>
@@ -92,7 +90,6 @@
               style="background: #fff; width: 100%;">
             </canvas>
           </div>
-          <!-- Модальное окно для увеличения -->
           <div *ngIf="enlargedTornado" class="modal-overlay">
             <div class="modal-content">
               <button class="close-button" (click)="toggleEnlargeTornadoChart()">✕</button>
@@ -103,7 +100,6 @@
             </div>
           </div>
         </div>
-        <!-- Пояснение к диаграмме -->
         <div style="font-size: 15px; color: #666; background: #f8f8f8; border-radius: 12px; padding: 20px;">
           <br>
           Диаграмма торнадо позволяет визуально оценить, на какие факторы скважины (или пласта) дебит реагирует наиболее сильно.
