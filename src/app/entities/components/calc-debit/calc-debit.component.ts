@@ -61,7 +61,7 @@ export class CalcDebitComponent {
       const discriminant = Ah ** 2 + 4 * Bh * (_Ppl ** 2 - (_Ppl - _deltaP) ** 2);
 
       if (discriminant < 0 || isNaN(discriminant)) {
-        console.warn('❌ Подкоренное выражение отрицательное или нечисло:', discriminant);
+        console.warn('Подкоренное выражение отрицательное:', discriminant);
         this.result = [
           `h₁ = ${h1.toFixed(3)} м`,
           `A* = ${A.toFixed(7)} МПа²·сут·м/тыс.м³`,
