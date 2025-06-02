@@ -67,8 +67,7 @@ export class CalcDebitComponent {
           `A* = ${A.toFixed(7)} МПа²·сут·м/тыс.м³`,
           `B* = ${B.toFixed(7)} МПа²·сут/тыс.м³)²·м³`,
           `Aг = ${Ah.toFixed(7)} МПа²·сут/тыс.м³`,
-          `Bг = ${Bh.toExponential(2)} (МПа²·сут/тыс.м³)²`,
-          `❌ Ошибка: подкоренное выражение < 0`
+          `Bг = ${Bh.toExponential(2)} (МПа²·сут/тыс.м³)²`
         ];
         return;
       }
@@ -76,19 +75,18 @@ export class CalcDebitComponent {
       const debit: number = ((-Ah + Math.sqrt(discriminant)) / (2 * Bh))*2;
 
       if (isNaN(debit)) {
-        console.warn('❌ Итоговый дебит = NaN. Проверь значения:', { Ah, Bh, discriminant });
+        console.warn('Итоговый дебит = NaN', { Ah, Bh, discriminant });
       }
 
       this.result = [
         `h₁ = ${h1.toFixed(3)} м,` +
         `A* = ${A.toFixed(7)} МПа²·сут·м/тыс.м³,` +
-        `B* = ${B.toFixed(7)} МПа²·сут/тыс.м³)²·м³,` +
+        `B* = ${B.toFixed(7)} (МПа²·сут/тыс.м³)²·м³,` +
         `Aг₁=Аг₂= ${Ah.toFixed(7)} МПа²·сут/тыс.м³,` +
         `Bг₁=Вг₂= ${Bh.toExponential(2)} (МПа²·сут/тыс.м³)²,`,
         `Дебит скважины: ${debit.toFixed(2)} тыс.м³/сут`
       ];
 
-      // 👇 Прокрутка вверх после расчёта
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
