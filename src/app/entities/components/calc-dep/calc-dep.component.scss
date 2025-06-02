@@ -12,7 +12,7 @@
   form {
     display: flex;
     flex-direction: column;
-    gap: 25px; /* отступ между полями */
+    gap: 25px; 
   }
 }
 
@@ -80,8 +80,8 @@ canvas {
 .modal-content canvas {
   position: relative;
   width: 100% !important;
-  height: 500px !important; /* фиксированная высота лучше для событий */
-  pointer-events: auto;     /* на всякий случай */
+  height: 500px !important; 
+  pointer-events: auto;    
   z-index: 1;
 }
 
